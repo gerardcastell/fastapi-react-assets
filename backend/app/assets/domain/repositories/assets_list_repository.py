@@ -1,14 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import List
 
-from .asset import Asset
+from app.assets.domain.entities.assets_list import AssetsList
 
 
-class AssetRepository(ABC):
+class AssetsListRepository(ABC):
     @abstractmethod
     def get_average_interest_rate(self) -> float:
         pass
 
     @abstractmethod
-    def save_list(self, assets: List[Asset]) -> List[Asset]:
+    def save(self, assets_list: AssetsList) -> AssetsList:
         pass
