@@ -9,11 +9,18 @@ class ContainerizedFastAPI(FastAPI):
     container: Container
 
 
-app = ContainerizedFastAPI()
+def create_app():
+    # Initialize the container
+    container = Container()
+    container.config.from_pydantic(config)
 
-# Initialize the container
-container = Container()
-container.config.from_pydantic(config)
+    # Create the app
+    app = ContainerizedFastAPI()
+
+    # Include the routers
+    app.include_router(health_router)
+
+    return app
 
 
-app.include_router(health_router)
+app = create_app()

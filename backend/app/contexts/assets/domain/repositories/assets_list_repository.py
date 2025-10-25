@@ -5,7 +5,7 @@ from app.contexts.assets.domain.entities.assets_list import AssetsList
 
 class AssetsListRepository(ABC):
     @abstractmethod
-    def get_average_interest_rate(self) -> float:
+    def get_average_interest_rate(self) -> float | None:
         pass
 
     @abstractmethod
