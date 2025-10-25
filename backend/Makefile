@@ -1,4 +1,4 @@
-.PHONY: help dev install-dev lint format precommit clean
+.PHONY: help dev install-dev lint format precommit clean test
 
 # Colors for output
 RED := \033[0;31m
@@ -12,16 +12,20 @@ help:
 	@echo "$(BLUE)Commands available:$(NC)"
 	@echo "$(YELLOW)dev$(NC) - Run the development server"
 	@echo "$(YELLOW)install-dev$(NC) - Install development dependencies"
+	@echo "$(YELLOW)test$(NC) - Run tests"
 	@echo "$(YELLOW)lint$(NC) - Run linting and type checking"
 	@echo "$(YELLOW)format$(NC) - Format code"
 	@echo "$(YELLOW)precommit$(NC) - Run pre-commit hooks"
 	@echo "$(YELLOW)clean$(NC) - Clean the project"
 dev:
-	uv run fastapi dev main.py
+	uv run fastapi dev app/main.py
 
 install-dev:
 	uv sync --group dev
 	uv run pre-commit install
+
+test:
+	uv run pytest tests/ -v
 
 lint:
 	uv run ruff check .
