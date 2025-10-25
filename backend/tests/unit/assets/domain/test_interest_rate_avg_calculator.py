@@ -2,6 +2,7 @@ import pytest
 
 from app.contexts.assets.domain.entities.asset import Asset
 from app.contexts.assets.domain.services.interest_rate_avg_calculator.errors import (
+    EmptyListError,
     InvalidListError,
 )
 from app.contexts.assets.domain.services.interest_rate_avg_calculator.service import (
@@ -91,12 +92,12 @@ class TestInterestRateAvgCalculatorService:
         assert result == 1.5
 
     def test_raises_invalid_list_error_with_empty_list(self):
-        """Test that InvalidListError is raised when empty list is provided."""
+        """Test that EmptyListError is raised when empty list is provided."""
         # Arrange
         assets = []
 
         # Act & Assert
-        with pytest.raises(InvalidListError) as exc_info:
+        with pytest.raises(EmptyListError) as exc_info:
             self.calculator(assets)
 
         assert str(exc_info.value) == "Empty list is not a valid list"
