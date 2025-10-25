@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from app.assets.domain.entities.assets_list import AssetsList
+from app.contexts.assets.domain.entities.assets_list import AssetsList
 
 
 class AssetsListRepository(ABC):

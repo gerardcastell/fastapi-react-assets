@@ -1,4 +1,4 @@
-from app.shared.domain.error import DomainError
+from app.contexts.shared.domain.error import DomainError
 
 
 class EmptyListError(DomainError):

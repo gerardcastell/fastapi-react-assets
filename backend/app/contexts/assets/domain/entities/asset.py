@@ -2,7 +2,7 @@ from typing import Annotated
 
 from pydantic import Field
 
-from app.shared.domain.entity import Entity
+from app.contexts.shared.domain.entity import Entity
 
 
 class Asset(Entity):

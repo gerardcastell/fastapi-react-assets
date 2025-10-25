@@ -1,10 +1,10 @@
 import pytest
 
-from app.assets.domain.entities.asset import Asset
-from app.assets.domain.services.interest_rate_avg_calculator.errors import (
+from app.contexts.assets.domain.entities.asset import Asset
+from app.contexts.assets.domain.services.interest_rate_avg_calculator.errors import (
     InvalidListError,
 )
-from app.assets.domain.services.interest_rate_avg_calculator.service import (
+from app.contexts.assets.domain.services.interest_rate_avg_calculator.service import (
     InterestRateAvgCalculatorService,
 )
 

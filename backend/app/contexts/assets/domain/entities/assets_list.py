@@ -2,8 +2,8 @@ from typing import Annotated, List
 
 from pydantic import Field
 
-from app.assets.domain.entities.asset import Asset
-from app.shared.domain.entity import Entity
+from app.contexts.assets.domain.entities.asset import Asset
+from app.contexts.shared.domain.entity import Entity
 
 
 class AssetsList(Entity):
