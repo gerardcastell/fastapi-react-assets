@@ -55,15 +55,15 @@ repos:
         description: Run Ruff formatter
 
   # Type checking
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+  - repo: local
     hooks:
       - id: mypy
-        description: Run MyPy type checker
-        additional_dependencies:
-          [types-requests, types-PyYAML, types-setuptools, fastapi]
-        args: [--config-file=backend/pyproject.toml]
-        files: ^.*\.py$
+        name: mypy
+        entry: bash -c 'cd backend && mypy --config-file=pyproject.toml --explicit-package-bases .'
+        language: system
+        types: [python]
+        pass_filenames: false
+        require_serial: true
 
   # Commit message linting
   - repo: https://github.com/commitizen-tools/commitizen

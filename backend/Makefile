@@ -1,4 +1,4 @@
-.PHONY: help dev install-dev lint format precommit
+.PHONY: help dev install-dev lint format precommit clean
 
 # Colors for output
 RED := \033[0;31m
@@ -15,7 +15,7 @@ help:
 	@echo "$(YELLOW)lint$(NC) - Run linting and type checking"
 	@echo "$(YELLOW)format$(NC) - Format code"
 	@echo "$(YELLOW)precommit$(NC) - Run pre-commit hooks"
-
+	@echo "$(YELLOW)clean$(NC) - Clean the project"
 dev:
 	uv run fastapi dev main.py
 
@@ -25,7 +25,7 @@ install-dev:
 
 lint:
 	uv run ruff check .
-	uv run mypy .
+	uv run mypy --config-file=pyproject.toml .
 
 format:
 	uv run ruff format .
@@ -33,3 +33,15 @@ format:
 
 precommit:
 	uv run pre-commit run --all-files
+
+clean:
+	rm -rf `find . -name __pycache__`
+	rm -f `find . -type f -name '*.py[co]' `
+	rm -f `find . -type f -name '*~' `
+	rm -f `find . -type f -name '.*~' `
+	rm -rf dist *.egg-info
+	rm -rf .cache
+	rm -rf .pytest_cache
+	rm -f coverage
+	rm -f coverage.*
+	rm -rf artifacts/*
