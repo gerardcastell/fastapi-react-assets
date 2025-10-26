@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+cd frontend
+npm run lint:fix
+npm run format
+git add --update
