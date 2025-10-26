@@ -1,8 +1,9 @@
 import axios from "axios";
+import { CONFIG } from "../../config";
 import type { IHttpClient } from "../../http/client.interface";
 
 export const axiosHttpClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: CONFIG.VITE_API_URL,
 });
 
 export class HttpClient implements IHttpClient {

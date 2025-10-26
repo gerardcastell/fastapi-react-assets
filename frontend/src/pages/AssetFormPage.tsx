@@ -1,5 +1,5 @@
 import { Stack } from "@mui/material";
-import { CreateAssetsForm } from "../features/assets/ui/create-assets/CreateAssetsForm";
+import { CreateAssetsForm } from "../features/assets/ui/create-assets/components/CreateAssetsForm";
 
 export const AssetFormPage = () => {
   return (

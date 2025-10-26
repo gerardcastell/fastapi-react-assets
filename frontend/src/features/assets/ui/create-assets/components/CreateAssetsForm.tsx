@@ -1,30 +1,17 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Stack, Typography } from "@mui/material";
-import { useForm, useFieldArray } from "react-hook-form";
-import { AssetForm } from "./AssetForm";
-import { assetsFormSchema, type AssetsFormSchemaType } from "./schemas";
 import AddIcon from "@mui/icons-material/Add";
+import { Button, Stack, Typography } from "@mui/material";
+import { useCreateAssetsForm } from "../hooks/useCreateAssetsForm";
+import { AssetForm } from "./AssetForm";
 
 export const CreateAssetsForm = () => {
-  const { handleSubmit, control } = useForm<AssetsFormSchemaType>({
-    resolver: zodResolver(assetsFormSchema),
-    defaultValues: {
-      assets: [{ id: "", interestRate: "" }],
-    },
-  });
-
-  const { fields, append, remove } = useFieldArray({
+  const {
+    handleSubmit,
     control,
-    name: "assets",
-  });
-
-  const handleSubmitForm = (data: AssetsFormSchemaType) => {
-    console.log(data);
-  };
-
-  const handleAddAsset = () => {
-    append({ id: "", interestRate: "" });
-  };
+    fields,
+    remove,
+    handleSubmitForm,
+    handleAddAsset,
+  } = useCreateAssetsForm();
 
   return (
     <Stack

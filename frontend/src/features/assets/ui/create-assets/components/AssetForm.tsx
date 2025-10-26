@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
 import type { Control } from "react-hook-form";
-import { RHFTextField } from "../../../../design-system/form/TextField";
+import { RHFTextField } from "../../../../../design-system/form/TextField";
 import type { AssetsFormSchemaType } from "./schemas";
 import DeleteIcon from "@mui/icons-material/Delete";
 interface AssetFormProps {
