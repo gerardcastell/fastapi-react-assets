@@ -2,7 +2,12 @@ import { z } from "zod";
 
 export const assetSchema = z.object({
   id: z.string().min(1, { message: "Id is required" }),
-  interestRate: z.string().min(1, { message: "Interest rate is required" }),
+  interestRate: z
+    .string()
+    .min(1, { message: "Interest rate is required" })
+    .refine((val) => !isNaN(Number(val)), {
+      message: "Interest rate must be a valid number",
+    }),
 });
 
 export const assetsFormSchema = z.object({

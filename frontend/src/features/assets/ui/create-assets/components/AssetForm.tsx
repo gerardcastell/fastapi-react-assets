@@ -31,6 +31,7 @@ export const AssetForm = ({
               name={`assets.${index}.interestRate`}
               label="Interest Rate"
               control={control}
+              textFieldProps={{ type: "number" }}
             />
           </Stack>
           {canRemove && (

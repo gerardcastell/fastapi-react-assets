@@ -35,7 +35,7 @@ export const InterestRateDisplay = () => {
         }}
       >
         {interestRate !== undefined && interestRate !== null
-          ? `${interestRate}%`
+          ? `${interestRate.toFixed(3)}%`
           : "--"}
       </div>
       <div style={{ fontSize: "0.95rem", color: "#aaa", marginTop: "0.25rem" }}>

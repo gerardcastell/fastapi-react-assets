@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router";
 import { HttpClient } from "../../../../../shared/external-lib/axios";
 import {
   useMutation,
@@ -9,6 +10,7 @@ import { CreateAssetsListService } from "../../../application/create-assets-list
 import { AssetsListApiRepository } from "../../../infrastructure/repositories/assets-list-api.repository";
 
 export const useCreateAssets = () => {
+  const navigate = useNavigate();
   const createAssetsListService = useMemo(
     () =>
       new CreateAssetsListService(
@@ -22,8 +24,9 @@ export const useCreateAssets = () => {
       return createAssetsListService.execute(assets);
     },
     onSuccess: () => {
-      toast.success("Assets created successfully");
       queryClient.invalidateQueries({ queryKey: ["interest-rate"] });
+      toast.success("Assets created successfully");
+      navigate("/");
     },
     onError: (e) => {
       toast.error(`Failed to create assets: ${e.message}`);
