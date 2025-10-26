@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 class AssetDto(BaseModel):
     id: Annotated[str, Field(description="The id of the asset")]
-    interest_rate: Annotated[int, Field(description="The interest rate of the asset")]
+    interest_rate: Annotated[float, Field(description="The interest rate of the asset")]
 
 
 class SaveAssetsListRequest(BaseModel):
