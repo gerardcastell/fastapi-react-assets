@@ -1,4 +1,4 @@
-import { LayoutPage } from "./design-system/LayoutPage";
+import { LayoutPage } from "./shared/design-system/LayoutPage";
 import Router from "./router/Router";
 import "./App.css";
 import {
