@@ -1,10 +1,10 @@
 from unittest.mock import Mock
 
 import pytest
-
 from app.contexts.assets.application.save_assets_list import SaveAssetsListService
 from app.contexts.assets.domain.entities.asset import Asset
 from app.contexts.assets.domain.entities.assets_list import AssetsList
+from app.contexts.assets.domain.entities.errors import DuplicateAssetIdError
 from app.contexts.assets.domain.repositories.assets_list_repository import (
     AssetsListRepository,
 )
@@ -195,3 +195,69 @@ class TestSaveAssetsListService:
         for i, asset in enumerate(called_assets):
             assert isinstance(asset, Asset)
             assert asset.interest_rate == i + 1
+
+    def test_save_assets_list_with_duplicate_ids(self):
+        """Test that saving assets with duplicate IDs raises DuplicateAssetIdError."""
+        # Arrange
+        assets = [
+            Asset(id="duplicate_id", interest_rate=5),
+            Asset(id="unique_id", interest_rate=10),
+            Asset(id="duplicate_id", interest_rate=15),
+        ]
+
+        # Act & Assert
+        with pytest.raises(DuplicateAssetIdError) as exc_info:
+            self.service(assets)
+
+        # Verify the error contains the duplicate ID
+        assert "duplicate_id" in str(exc_info.value)
+        assert exc_info.value.duplicate_ids == ["duplicate_id"]
+
+        # Verify calculator was called but repository was not
+        self.mock_calculator.assert_called_once()
+        self.mock_repository.save.assert_not_called()
+
+    def test_save_assets_list_with_multiple_duplicate_ids(self):
+        """Test that saving assets with multiple duplicate IDs raises DuplicateAssetIdError."""
+        # Arrange
+        assets = [
+            Asset(id="id_1", interest_rate=5),
+            Asset(id="id_2", interest_rate=10),
+            Asset(id="id_1", interest_rate=15),
+            Asset(id="id_3", interest_rate=20),
+            Asset(id="id_2", interest_rate=25),
+        ]
+
+        # Act & Assert
+        with pytest.raises(DuplicateAssetIdError) as exc_info:
+            self.service(assets)
+
+        # Verify the error contains both duplicate IDs
+        assert "id_1" in str(exc_info.value)
+        assert "id_2" in str(exc_info.value)
+        assert set(exc_info.value.duplicate_ids) == {"id_1", "id_2"}
+
+        # Verify calculator was called but repository was not
+        self.mock_calculator.assert_called_once()
+        self.mock_repository.save.assert_not_called()
+
+    def test_save_assets_list_with_all_same_ids(self):
+        """Test that saving assets where all have the same ID raises DuplicateAssetIdError."""
+        # Arrange
+        assets = [
+            Asset(id="same_id", interest_rate=5),
+            Asset(id="same_id", interest_rate=10),
+            Asset(id="same_id", interest_rate=15),
+        ]
+
+        # Act & Assert
+        with pytest.raises(DuplicateAssetIdError) as exc_info:
+            self.service(assets)
+
+        # Verify the error contains the duplicate ID
+        assert "same_id" in str(exc_info.value)
+        assert exc_info.value.duplicate_ids == ["same_id"]
+
+        # Verify calculator was called but repository was not
+        self.mock_calculator.assert_called_once()
+        self.mock_repository.save.assert_not_called()

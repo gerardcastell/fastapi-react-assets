@@ -1,6 +1,5 @@
-from fastapi.testclient import TestClient
-
 from app.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
@@ -258,6 +257,80 @@ class TestSaveAssetsList:
                 {"id": "id_1", "interest_rate": 1},
                 {"id": "id_2", "interest_rate": 2},
                 {"id": "id_3", "interest_rate": 3},
+            ]
+        }
+
+        response = test_client.post(f"{base_url}/asset", json=assets_data)
+
+        assert response.status_code == 200
+        response_data = response.json()
+        assert response_data["message"] == "Assets list saved successfully"
+
+    def test_save_assets_list_with_duplicate_ids(self, test_client: TestClient):
+        """Test that saving assets with duplicate IDs returns 422 error."""
+        assets_data: dict = {
+            "assets": [
+                {"id": "duplicate_id", "interest_rate": 5},
+                {"id": "unique_id", "interest_rate": 10},
+                {"id": "duplicate_id", "interest_rate": 15},
+            ]
+        }
+
+        response = test_client.post(f"{base_url}/asset", json=assets_data)
+
+        assert response.status_code == 422
+        response_data = response.json()
+        assert "duplicate_id" in response_data["detail"].lower()
+
+    def test_save_assets_list_with_multiple_duplicate_ids(
+        self, test_client: TestClient
+    ):
+        """Test that saving assets with multiple duplicate IDs returns 422 error."""
+        assets_data: dict = {
+            "assets": [
+                {"id": "id_1", "interest_rate": 5},
+                {"id": "id_2", "interest_rate": 10},
+                {"id": "id_1", "interest_rate": 15},
+                {"id": "id_3", "interest_rate": 20},
+                {"id": "id_2", "interest_rate": 25},
+            ]
+        }
+
+        response = test_client.post(f"{base_url}/asset", json=assets_data)
+
+        assert response.status_code == 422
+        response_data = response.json()
+        # Should mention both duplicate IDs in the error message
+        detail_lower = response_data["detail"].lower()
+        assert "id_1" in detail_lower
+        assert "id_2" in detail_lower
+        assert "duplicate" in detail_lower
+
+    def test_save_assets_list_with_all_same_ids(self, test_client: TestClient):
+        """Test that saving assets where all have the same ID returns 422 error."""
+        assets_data: dict = {
+            "assets": [
+                {"id": "same_id", "interest_rate": 5},
+                {"id": "same_id", "interest_rate": 10},
+                {"id": "same_id", "interest_rate": 15},
+            ]
+        }
+
+        response = test_client.post(f"{base_url}/asset", json=assets_data)
+
+        assert response.status_code == 422
+        response_data = response.json()
+        assert "same_id" in response_data["detail"].lower()
+        assert "duplicate" in response_data["detail"].lower()
+
+    def test_save_assets_list_with_unique_ids_succeeds(self, test_client: TestClient):
+        """Test that saving assets with all unique IDs succeeds."""
+        assets_data: dict = {
+            "assets": [
+                {"id": "unique_id_1", "interest_rate": 5},
+                {"id": "unique_id_2", "interest_rate": 10},
+                {"id": "unique_id_3", "interest_rate": 15},
+                {"id": "unique_id_4", "interest_rate": 20},
             ]
         }
 

@@ -149,4 +149,119 @@ describe("Create Assets", () => {
     // Verify only 3 assets were submitted
     cy.wait("@postAssets").its("request.body.assets").should("have.length", 3);
   });
+
+  it("should handle duplicate asset IDs validation error", () => {
+    // Add a second asset
+    cy.contains("button", "Add New Asset").click();
+
+    // Fill both assets with the same ID
+    cy.fillAssetForm(0, "DUPLICATE-ID", 5.5);
+    cy.fillAssetForm(1, "DUPLICATE-ID", 7.25);
+
+    // Intercept the API call to return 422 error for duplicate IDs
+    cy.intercept("POST", "**/asset", {
+      statusCode: 422,
+      body: {
+        detail: "Duplicate asset IDs found: DUPLICATE-ID",
+      },
+    }).as("postAssetsDuplicate");
+
+    // Submit the form
+    cy.contains("button", "Create Assets").click();
+
+    // Wait for the API call and verify the request
+    cy.wait("@postAssetsDuplicate")
+      .its("request.body")
+      .should("deep.equal", {
+        assets: [
+          { id: "DUPLICATE-ID", interest_rate: 5.5 },
+          { id: "DUPLICATE-ID", interest_rate: 7.25 },
+        ],
+      });
+
+    // Form should still be visible after error (not redirected)
+    cy.contains("h4", "Create Assets").should("be.visible");
+    cy.url().should("include", "/assets/new");
+
+    // Assets should still be filled in the form
+    cy.get('input[name="assets.0.id"]').should("have.value", "DUPLICATE-ID");
+    cy.get('input[name="assets.1.id"]').should("have.value", "DUPLICATE-ID");
+  });
+
+  it("should handle multiple duplicate asset IDs validation error", () => {
+    // Add two more assets (total of 3)
+    cy.contains("button", "Add New Asset").click();
+    cy.contains("button", "Add New Asset").click();
+
+    // Fill assets with multiple duplicate IDs
+    cy.fillAssetForm(0, "ID-1", 5.5);
+    cy.fillAssetForm(1, "ID-2", 7.25);
+    cy.fillAssetForm(2, "ID-1", 9.0); // Duplicate of ID-1
+
+    // Intercept the API call to return 422 error for multiple duplicate IDs
+    cy.intercept("POST", "**/asset", {
+      statusCode: 422,
+      body: {
+        detail: "Duplicate asset IDs found: ID-1",
+      },
+    }).as("postAssetsMultipleDuplicates");
+
+    // Submit the form
+    cy.contains("button", "Create Assets").click();
+
+    // Wait for the API call and verify the request
+    cy.wait("@postAssetsMultipleDuplicates")
+      .its("request.body")
+      .should("deep.equal", {
+        assets: [
+          { id: "ID-1", interest_rate: 5.5 },
+          { id: "ID-2", interest_rate: 7.25 },
+          { id: "ID-1", interest_rate: 9.0 },
+        ],
+      });
+
+    // Form should still be visible after error
+    cy.contains("h4", "Create Assets").should("be.visible");
+    cy.url().should("include", "/assets/new");
+  });
+
+  it("should succeed when fixing duplicate IDs", () => {
+    // Add a second asset
+    cy.contains("button", "Add New Asset").click();
+
+    // First attempt: Fill both assets with the same ID
+    cy.fillAssetForm(0, "DUPLICATE-ID", 5.5);
+    cy.fillAssetForm(1, "DUPLICATE-ID", 7.25);
+
+    // Intercept the first API call to return 422 error
+    cy.intercept("POST", "**/asset", {
+      statusCode: 422,
+      body: {
+        detail: "Duplicate asset IDs found: DUPLICATE-ID",
+      },
+    }).as("postAssetsDuplicate");
+
+    // Submit the form
+    cy.contains("button", "Create Assets").click();
+    cy.wait("@postAssetsDuplicate");
+
+    // Fix the duplicate ID
+    cy.fillAssetForm(1, "UNIQUE-ID", 7.25);
+
+    // Intercept the second API call to return success
+    cy.interceptPostAssets(201);
+
+    // Submit the form again
+    cy.contains("button", "Create Assets").click();
+
+    // Wait for the successful API call
+    cy.wait("@postAssets")
+      .its("request.body")
+      .should("deep.equal", {
+        assets: [
+          { id: "DUPLICATE-ID", interest_rate: 5.5 },
+          { id: "UNIQUE-ID", interest_rate: 7.25 },
+        ],
+      });
+  });
 });

@@ -7,6 +7,7 @@ from app.contexts.assets.application.get_average_interest_rate import (
 )
 from app.contexts.assets.application.save_assets_list import SaveAssetsListService
 from app.contexts.assets.domain.entities.asset import Asset
+from app.contexts.assets.domain.entities.errors import DuplicateAssetIdError
 from app.contexts.assets.domain.services.interest_rate_avg_calculator.errors import (
     EmptyListError,
     InvalidListError,
@@ -38,6 +39,8 @@ async def save_assets_list(
         return {"message": "Assets list saved successfully"}
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=f"Validation error: {str(e)}")
+    except DuplicateAssetIdError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     except EmptyListError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except InvalidListError as e:
