@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.contexts.assets.infrastructure.api.routes import router as assets_router
 from app.contexts.health.infrastructure.api.routes import router as health_router
@@ -18,6 +19,18 @@ def create_app():
     # Create the app
     app = ContainerizedFastAPI()
     app.container = container
+
+    # Configure CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://localhost:5173",
+            "http://localhost:3000",
+        ],  # Frontend dev servers
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     # Wire the container
     container.wire(

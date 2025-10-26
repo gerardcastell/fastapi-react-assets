@@ -1,12 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import {
   assetsFormSchema,
   type AssetsFormSchemaType,
 } from "../components/schemas";
 import { useCreateAssets } from "./useCreateAssets";
+
 export const useCreateAssetsForm = () => {
   const { createAssets, isPending } = useCreateAssets();
+  const navigate = useNavigate();
   const { handleSubmit, control } = useForm<AssetsFormSchemaType>({
     resolver: zodResolver(assetsFormSchema),
     defaultValues: {
@@ -26,6 +29,7 @@ export const useCreateAssetsForm = () => {
         interestRate: Number(asset.interestRate),
       })),
     );
+    navigate("/");
   };
 
   const handleAddAsset = () => {

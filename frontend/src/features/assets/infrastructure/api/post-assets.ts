@@ -17,7 +17,5 @@ export const postAssets = async (
   body: PostAssetRequestDtoT,
 ): Promise<void> => {
   postAssetRequestDtoSchema.parse(body);
-  await httpClient.post<void>("/asset", {
-    body,
-  });
+  await httpClient.post<void>("/asset", body);
 };
