@@ -19,6 +19,7 @@ export {
   QueryClient,
   QueryClientProvider,
   useMutation,
+  useQueryClient,
 } from "@tanstack/react-query";
 
 // Dev tools

@@ -12,9 +12,8 @@ export type GetAverageInterestRateResponseDtoT = z.infer<
 export const getAverageInterestRate = async (
   httpClient: IHttpClient,
 ): Promise<GetAverageInterestRateResponseDtoT> => {
-  const response = await httpClient.get<GetAverageInterestRateResponseDtoT>(
-    "/average-interest-rate",
-  );
+  const response =
+    await httpClient.get<GetAverageInterestRateResponseDtoT>("/interest_rate");
   getAverageInterestRateResponseDtoSchema.parse(response);
   return response;
 };

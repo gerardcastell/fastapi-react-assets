@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { InterestRateDisplay } from "../features/assets/ui/display-interest-rate/components/InterestRateDisplay";
 
 export const HomePage = () => {
   return (
@@ -11,7 +12,7 @@ export const HomePage = () => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        mt: "25vh",
+        mt: "10vh",
         textAlign: "center",
         px: 2,
       }}
@@ -21,6 +22,7 @@ export const HomePage = () => {
         their values.
       </Typography>
       <Stack direction={"column"} gap={2} alignItems={"center"}>
+        <InterestRateDisplay />
         <Typography variant="body1">
           You can create assets and obtain the average interest rate.
         </Typography>
