@@ -2,7 +2,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useInterestRateDisplay } from "../hooks/useInterestRateDisplay";
 
 export const InterestRateDisplay = () => {
-  const { interestRate, isFetching, error } = useInterestRateDisplay();
+  const { interestRate, isFetching, isError } = useInterestRateDisplay();
 
   return (
     <div
@@ -35,11 +35,15 @@ export const InterestRateDisplay = () => {
         }}
       >
         {interestRate !== undefined && interestRate !== null
-          ? `${interestRate.toFixed(3)}%`
+          ? `${interestRate.toFixed(2)}%`
           : "--"}
       </div>
       <div style={{ fontSize: "0.95rem", color: "#aaa", marginTop: "0.25rem" }}>
-        {isFetching ? <CircularProgress /> : error ? "Failed to load." : null}
+        {isFetching && !isError ? (
+          <CircularProgress />
+        ) : isError ? (
+          "Failed to load."
+        ) : null}
       </div>
     </div>
   );

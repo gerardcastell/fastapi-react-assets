@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 import { HomePage } from "../pages/HomePage";
-import { AssetFormPage } from "../pages/AssetFormPage";
+import { CreateAssetsPage } from "../pages/CreateAssetsPage";
 
 const Router = () => {
   return (
@@ -8,7 +8,7 @@ const Router = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="assets">
-          <Route path="new" element={<AssetFormPage />} />
+          <Route path="new" element={<CreateAssetsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

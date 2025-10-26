@@ -1,0 +1,17 @@
+{
+  "assets": [
+    {
+      "id": "ASSET-001",
+      "interest_rate": 5.5
+    },
+    {
+      "id": "ASSET-002",
+      "interest_rate": 7.25
+    },
+    {
+      "id": "ASSET-003",
+      "interest_rate": 4.0
+    }
+  ],
+  "average_interest_rate": 5.58
+}

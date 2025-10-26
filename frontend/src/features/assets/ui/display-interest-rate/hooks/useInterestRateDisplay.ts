@@ -15,15 +15,19 @@ export const useInterestRateDisplay = () => {
   const {
     data: interestRate,
     isFetching,
+    isError,
     error,
   } = useQuery({
     queryKey: ["interest-rate"],
     queryFn: () => getAverageInterestRateService.execute(),
+    throwOnError: false,
+    retry: false,
   });
 
   return {
     interestRate: interestRate?.value,
     isFetching,
+    isError,
     error,
   };
 };

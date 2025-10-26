@@ -1,6 +1,8 @@
-# Ignore artifacts:
+node_modules
+dist
 build
 coverage
-
-# Ignore all HTML files:
-**/*.html
+cypress/videos
+cypress/screenshots
+cypress/downloads
+*.log
