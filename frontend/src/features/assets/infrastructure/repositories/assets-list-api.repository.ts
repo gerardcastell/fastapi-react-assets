@@ -24,8 +24,11 @@ export class AssetsListApiRepository implements AssetsListRepository {
     });
   }
 
-  async getAverageInterestRate(): Promise<AverageInterestRateEntity> {
+  async getAverageInterestRate(): Promise<AverageInterestRateEntity | null> {
     const response = await getAverageInterestRate(this.httpClient);
+    if (response.average_interest_rate === null) {
+      return null;
+    }
     getAverageInterestRateResponseDtoSchema.parse(response);
     return new AverageInterestRateEntity({
       value: response.average_interest_rate,

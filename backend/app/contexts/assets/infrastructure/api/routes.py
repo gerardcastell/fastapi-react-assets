@@ -52,6 +52,4 @@ async def get_average_interest_rate(
     ),
 ) -> GetAverageInterestRateResponse:
     average_interest_rate = get_average_interest_rate_service()
-    if average_interest_rate is None:
-        raise HTTPException(status_code=422, detail="No assets found")
     return GetAverageInterestRateResponse(average_interest_rate=average_interest_rate)

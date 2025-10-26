@@ -11,7 +11,6 @@ import { ToastContainer } from "./shared/external-lib/react-toastify";
 const queryClient = new QueryClient();
 
 function App() {
-  console.log("ENV VARS", import.meta.env);
   return (
     <QueryClientProvider client={queryClient}>
       <LayoutPage>

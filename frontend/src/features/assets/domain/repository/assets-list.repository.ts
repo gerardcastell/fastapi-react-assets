@@ -3,5 +3,5 @@ import type { AverageInterestRateEntity } from "../entities/average-interest-rat
 
 export interface AssetsListRepository {
   create(assetsList: AssetEntity[]): Promise<void>;
-  getAverageInterestRate(): Promise<AverageInterestRateEntity>;
+  getAverageInterestRate(): Promise<AverageInterestRateEntity | null>;
 }

@@ -8,7 +8,7 @@ export class GetAverageInterestRateService {
     this.assetsListRepository = assetsListRepository;
   }
 
-  async execute(): Promise<AverageInterestRateEntity> {
+  async execute(): Promise<AverageInterestRateEntity | null> {
     return this.assetsListRepository.getAverageInterestRate();
   }
 }

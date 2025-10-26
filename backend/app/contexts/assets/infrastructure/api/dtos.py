@@ -19,5 +19,5 @@ class SaveAssetsListRequest(BaseModel):
 
 class GetAverageInterestRateResponse(BaseModel):
     average_interest_rate: Annotated[
-        float, Field(description="The average interest rate of the assets")
+        float | None, Field(description="The average interest rate of the assets")
     ]

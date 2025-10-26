@@ -1,6 +1,5 @@
-from fastapi.testclient import TestClient
-
 from app.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
@@ -16,9 +15,9 @@ class TestGetAverageInterestRate:
         """Test getting average interest rate when no assets are stored."""
         response = test_client.get(f"{base_url}/interest_rate")
 
-        assert response.status_code == 422
+        assert response.status_code == 200
         response_data = response.json()
-        assert response_data["detail"] == "No assets found"
+        assert response_data["average_interest_rate"] is None
 
     def test_get_average_interest_rate_after_saving_assets(
         self, test_client: TestClient

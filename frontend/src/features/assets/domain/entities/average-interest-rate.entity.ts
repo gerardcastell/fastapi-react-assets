@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 export const averageInterestRateSchema = z.object({
-  value: z.number(),
+  value: z.number().nullable(),
 });
 
 export type AverageInterestRateT = z.infer<typeof averageInterestRateSchema>;
 
 export class AverageInterestRateEntity implements AverageInterestRateT {
-  readonly value: number;
+  readonly value: number | null;
 
   constructor(value: AverageInterestRateT) {
     AverageInterestRateEntity.validate(value);
