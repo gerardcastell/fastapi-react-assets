@@ -17,10 +17,7 @@ class SaveAssetsListService:
         self.assets_list_repository = assets_list_repository
         self.interest_rate_avg_calculator_service = interest_rate_avg_calculator_service
 
-    def __call__(self, raw_assets_list: list[dict]) -> AssetsList:
-        # Create the asset entities from the raw data
-        assets = [Asset(**asset) for asset in raw_assets_list]
-
+    def __call__(self, assets: list[Asset]) -> AssetsList:
         # Calculate the average interest rate
         avg_interest_rate = self.interest_rate_avg_calculator_service(assets)
 

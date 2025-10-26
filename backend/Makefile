@@ -25,7 +25,7 @@ install-dev:
 	uv run pre-commit install
 
 test:
-	uv run pytest tests/ -v
+	uv run pytest tests/ -v $(args)
 
 lint:
 	uv run ruff check .

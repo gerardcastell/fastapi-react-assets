@@ -10,6 +10,7 @@ from app.contexts.assets.domain.repositories.assets_list_repository import (
 )
 from app.contexts.assets.domain.services.interest_rate_avg_calculator.errors import (
     EmptyListError,
+    InvalidListError,
 )
 from app.contexts.assets.domain.services.interest_rate_avg_calculator.service import (
     InterestRateAvgCalculatorService,
@@ -20,7 +21,7 @@ class TestSaveAssetsListService:
     def setup_method(self):
         """Set up test fixtures before each test method."""
         self.mock_repository = Mock(spec=AssetsListRepository)
-        self.mock_calculator = Mock(spec=InterestRateAvgCalculatorService)
+        self.mock_calculator = Mock(wraps=InterestRateAvgCalculatorService())
         self.service = SaveAssetsListService(
             assets_list_repository=self.mock_repository,
             interest_rate_avg_calculator_service=self.mock_calculator,
@@ -29,26 +30,25 @@ class TestSaveAssetsListService:
     def test_save_assets_list_success(self):
         """Test successful save of assets list with valid data."""
         # Arrange
-        raw_assets_list = [
-            {"interest_rate": 5},
-            {"interest_rate": 10},
-            {"interest_rate": 15},
+        assets = [
+            Asset(id="id_1", interest_rate=5),
+            Asset(id="id_2", interest_rate=10),
+            Asset(id="id_3", interest_rate=15),
         ]
-        expected_avg_rate = 10.0
+        expected_avg_rate = 10.0  # (5 + 10 + 15) / 3 = 10.0
         expected_assets_list = AssetsList(
             assets=[
-                Asset(interest_rate=5),
-                Asset(interest_rate=10),
-                Asset(interest_rate=15),
+                Asset(id="id_1", interest_rate=5),
+                Asset(id="id_2", interest_rate=10),
+                Asset(id="id_3", interest_rate=15),
             ],
             avg_interest_rate=expected_avg_rate,
         )
 
-        self.mock_calculator.return_value = expected_avg_rate
         self.mock_repository.save.return_value = expected_assets_list
 
         # Act
-        result = self.service(raw_assets_list)
+        result = self.service(assets)
 
         # Assert
         assert result == expected_assets_list
@@ -66,41 +66,40 @@ class TestSaveAssetsListService:
     def test_save_assets_list_empty_list(self):
         """Test handling of empty assets list (should raise EmptyListError)."""
         # Arrange
-        raw_assets_list = []
-        self.mock_calculator.side_effect = EmptyListError()
+        assets = []
 
         # Act & Assert
         with pytest.raises(EmptyListError):
-            self.service(raw_assets_list)
+            self.service(assets)
 
         # Verify calculator was called but repository was not
         self.mock_calculator.assert_called_once()
         self.mock_repository.save.assert_not_called()
 
     def test_save_assets_list_none_list(self):
-        """Test handling of None assets list (should raise TypeError)."""
+        """Test handling of None assets list (should raise InvalidListError)."""
         # Arrange
-        raw_assets_list = None
+        assets = None
 
         # Act & Assert
-        with pytest.raises(TypeError, match="'NoneType' object is not iterable"):
-            self.service(raw_assets_list)
+        with pytest.raises(InvalidListError):
+            self.service(assets)
 
-        # Verify neither calculator nor repository were called
-        self.mock_calculator.assert_not_called()
+        # Verify calculator was called (it handles the None check and raises the exception)
+        # but repository was not called
+        self.mock_calculator.assert_called_once_with(assets)
         self.mock_repository.save.assert_not_called()
 
     def test_save_assets_list_repository_called_with_correct_parameters(self):
         """Test that repository save method is called with correct parameters."""
         # Arrange
-        raw_assets_list = [{"interest_rate": 8}, {"interest_rate": 12}]
-        expected_avg_rate = 10.0
+        assets = [Asset(id="id_1", interest_rate=8), Asset(id="id_2", interest_rate=12)]
+        expected_avg_rate = 10.0  # (8 + 12) / 2 = 10.0
 
-        self.mock_calculator.return_value = expected_avg_rate
         self.mock_repository.save.return_value = Mock()
 
         # Act
-        self.service(raw_assets_list)
+        self.service(assets)
 
         # Assert
         self.mock_repository.save.assert_called_once()
@@ -114,14 +113,12 @@ class TestSaveAssetsListService:
     def test_save_assets_list_calculator_called_with_asset_entities(self):
         """Test that interest rate calculator is called with correct parameters."""
         # Arrange
-        raw_assets_list = [{"interest_rate": 3}, {"interest_rate": 7}]
-        expected_avg_rate = 5.0
+        assets = [Asset(id="id_1", interest_rate=3), Asset(id="id_2", interest_rate=7)]
 
-        self.mock_calculator.return_value = expected_avg_rate
         self.mock_repository.save.return_value = Mock()
 
         # Act
-        self.service(raw_assets_list)
+        self.service(assets)
 
         # Assert
         self.mock_calculator.assert_called_once()
@@ -135,18 +132,17 @@ class TestSaveAssetsListService:
     def test_save_assets_list_single_asset(self):
         """Test save with a single asset."""
         # Arrange
-        raw_assets_list = [{"interest_rate": 25}]
-        expected_avg_rate = 25.0
+        assets = [Asset(id="id_1", interest_rate=25)]
+        expected_avg_rate = 25.0  # Single asset, so avg = 25.0
         expected_assets_list = AssetsList(
-            assets=[Asset(interest_rate=25)],
+            assets=[Asset(id="id_1", interest_rate=25)],
             avg_interest_rate=expected_avg_rate,
         )
 
-        self.mock_calculator.return_value = expected_avg_rate
         self.mock_repository.save.return_value = expected_assets_list
 
         # Act
-        result = self.service(raw_assets_list)
+        result = self.service(assets)
 
         # Assert
         assert result == expected_assets_list
@@ -156,18 +152,20 @@ class TestSaveAssetsListService:
     def test_save_assets_list_with_zero_interest_rate(self):
         """Test save with assets having zero interest rate."""
         # Arrange
-        raw_assets_list = [{"interest_rate": 0}, {"interest_rate": 0}]
-        expected_avg_rate = 0.0
+        assets = [Asset(id="id_1", interest_rate=0), Asset(id="id_2", interest_rate=0)]
+        expected_avg_rate = 0.0  # (0 + 0) / 2 = 0.0
         expected_assets_list = AssetsList(
-            assets=[Asset(interest_rate=0), Asset(interest_rate=0)],
+            assets=[
+                Asset(id="id_1", interest_rate=0),
+                Asset(id="id_2", interest_rate=0),
+            ],
             avg_interest_rate=expected_avg_rate,
         )
 
-        self.mock_calculator.return_value = expected_avg_rate
         self.mock_repository.save.return_value = expected_assets_list
 
         # Act
-        result = self.service(raw_assets_list)
+        result = self.service(assets)
 
         # Assert
         assert result == expected_assets_list
@@ -177,18 +175,16 @@ class TestSaveAssetsListService:
     def test_save_assets_list_asset_creation_from_raw_data(self):
         """Test that Asset entities are properly created from raw data."""
         # Arrange
-        raw_assets_list = [
-            {"interest_rate": 1},
-            {"interest_rate": 2},
-            {"interest_rate": 3},
+        assets = [
+            Asset(id="id_1", interest_rate=1),
+            Asset(id="id_2", interest_rate=2),
+            Asset(id="id_3", interest_rate=3),
         ]
-        expected_avg_rate = 2.0
 
-        self.mock_calculator.return_value = expected_avg_rate
         self.mock_repository.save.return_value = Mock()
 
         # Act
-        self.service(raw_assets_list)
+        self.service(assets=assets)
 
         # Assert
         # Verify that the calculator was called with properly created Asset entities

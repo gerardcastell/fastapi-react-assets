@@ -33,5 +33,5 @@ class AssetsServicesContainer(containers.DeclarativeContainer):
         interest_rate_avg_calculator_service=interest_rate_avg_calculator_service,
     )
     get_average_interest_rate_service = providers.Factory(
-        GetAverageInterestRateService, persistence=persistence
+        GetAverageInterestRateService, assets_list_repository=assets_list_repository
     )
