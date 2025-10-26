@@ -10,15 +10,19 @@ base_url = ""
 class TestGetAverageInterestRate:
     """Integration tests for the get average interest rate endpoint."""
 
-    def test_get_average_interest_rate_when_no_assets_exist(self):
+    def test_get_average_interest_rate_when_no_assets_exist(
+        self, test_client: TestClient
+    ):
         """Test getting average interest rate when no assets are stored."""
-        response = client.get(f"{base_url}/interest_rate")
+        response = test_client.get(f"{base_url}/interest_rate")
 
         assert response.status_code == 422
         response_data = response.json()
         assert response_data["detail"] == "No assets found"
 
-    def test_get_average_interest_rate_after_saving_assets(self):
+    def test_get_average_interest_rate_after_saving_assets(
+        self, test_client: TestClient
+    ):
         """Test getting average interest rate after saving assets."""
         # First, save some assets
         assets_data = {
@@ -29,32 +33,34 @@ class TestGetAverageInterestRate:
             ]
         }
 
-        save_response = client.post(f"{base_url}/asset", json=assets_data)
+        save_response = test_client.post(f"{base_url}/asset", json=assets_data)
         assert save_response.status_code == 200
 
         # Then get the average interest rate
-        response = client.get(f"{base_url}/interest_rate")
+        response = test_client.get(f"{base_url}/interest_rate")
 
         assert response.status_code == 200
         response_data = response.json()
         assert response_data["average_interest_rate"] == 10.0  # (5 + 10 + 15) / 3 = 10
 
-    def test_get_average_interest_rate_with_single_asset(self):
+    def test_get_average_interest_rate_with_single_asset(self, test_client: TestClient):
         """Test getting average interest rate with a single asset."""
         # Save a single asset
         assets_data = {"assets": [{"id": "id_1", "interest_rate": 7}]}
 
-        save_response = client.post(f"{base_url}/asset", json=assets_data)
+        save_response = test_client.post(f"{base_url}/asset", json=assets_data)
         assert save_response.status_code == 200
 
         # Get the average interest rate
-        response = client.get(f"{base_url}/interest_rate")
+        response = test_client.get(f"{base_url}/interest_rate")
 
         assert response.status_code == 200
         response_data = response.json()
         assert response_data["average_interest_rate"] == 7.0
 
-    def test_get_average_interest_rate_with_zero_interest_rate(self):
+    def test_get_average_interest_rate_with_zero_interest_rate(
+        self, test_client: TestClient
+    ):
         """Test getting average interest rate with assets having zero interest rate."""
         assets_data = {
             "assets": [
@@ -64,16 +70,18 @@ class TestGetAverageInterestRate:
             ]
         }
 
-        save_response = client.post(f"{base_url}/asset", json=assets_data)
+        save_response = test_client.post(f"{base_url}/asset", json=assets_data)
         assert save_response.status_code == 200
 
-        response = client.get(f"{base_url}/interest_rate")
+        response = test_client.get(f"{base_url}/interest_rate")
 
         assert response.status_code == 200
         response_data = response.json()
         assert response_data["average_interest_rate"] == 0.0
 
-    def test_get_average_interest_rate_with_negative_interest_rate(self):
+    def test_get_average_interest_rate_with_negative_interest_rate(
+        self, test_client: TestClient
+    ):
         """Test getting average interest rate with negative interest rates."""
         assets_data = {
             "assets": [
@@ -83,16 +91,18 @@ class TestGetAverageInterestRate:
             ]
         }
 
-        save_response = client.post(f"{base_url}/asset", json=assets_data)
+        save_response = test_client.post(f"{base_url}/asset", json=assets_data)
         assert save_response.status_code == 200
 
-        response = client.get(f"{base_url}/interest_rate")
+        response = test_client.get(f"{base_url}/interest_rate")
 
         assert response.status_code == 200
         response_data = response.json()
         assert response_data["average_interest_rate"] == 1.0  # (-5 + 10 + -2) / 3 = 1
 
-    def test_get_average_interest_rate_with_large_numbers(self):
+    def test_get_average_interest_rate_with_large_numbers(
+        self, test_client: TestClient
+    ):
         """Test getting average interest rate with large numbers."""
         assets_data = {
             "assets": [
@@ -102,10 +112,10 @@ class TestGetAverageInterestRate:
             ]
         }
 
-        save_response = client.post(f"{base_url}/asset", json=assets_data)
+        save_response = test_client.post(f"{base_url}/asset", json=assets_data)
         assert save_response.status_code == 200
 
-        response = client.get(f"{base_url}/interest_rate")
+        response = test_client.get(f"{base_url}/interest_rate")
 
         assert response.status_code == 200
         response_data = response.json()
@@ -113,7 +123,9 @@ class TestGetAverageInterestRate:
             response_data["average_interest_rate"] == 2000000.0
         )  # (1000000 + 2000000 + 3000000) / 3 = 2000000
 
-    def test_get_average_interest_rate_with_decimal_calculation(self):
+    def test_get_average_interest_rate_with_decimal_calculation(
+        self, test_client: TestClient
+    ):
         """Test getting average interest rate that results in a decimal."""
         assets_data = {
             "assets": [
@@ -123,16 +135,18 @@ class TestGetAverageInterestRate:
             ]
         }
 
-        save_response = client.post(f"{base_url}/asset", json=assets_data)
+        save_response = test_client.post(f"{base_url}/asset", json=assets_data)
         assert save_response.status_code == 200
 
-        response = client.get(f"{base_url}/interest_rate")
+        response = test_client.get(f"{base_url}/interest_rate")
 
         assert response.status_code == 200
         response_data = response.json()
         assert response_data["average_interest_rate"] == 2.0  # (1 + 2 + 3) / 3 = 2.0
 
-    def test_get_average_interest_rate_endpoint_structure(self):
+    def test_get_average_interest_rate_endpoint_structure(
+        self, test_client: TestClient
+    ):
         """Test that the endpoint returns the expected JSON structure."""
         # Save some assets first
         assets_data = {
@@ -141,9 +155,9 @@ class TestGetAverageInterestRate:
                 {"id": "id_2", "interest_rate": 10},
             ]
         }
-        client.post(f"{base_url}/asset", json=assets_data)
+        test_client.post(f"{base_url}/asset", json=assets_data)
 
-        response = client.get(f"{base_url}/interest_rate")
+        response = test_client.get(f"{base_url}/interest_rate")
 
         assert response.status_code == 200
         response_data = response.json()
@@ -154,7 +168,9 @@ class TestGetAverageInterestRate:
         # Check that the average_interest_rate is a number
         assert isinstance(response_data["average_interest_rate"], (int, float))
 
-    def test_get_average_interest_rate_after_multiple_saves(self):
+    def test_get_average_interest_rate_after_multiple_saves(
+        self, test_client: TestClient
+    ):
         """Test that the latest save overwrites previous data."""
         # Save first set of assets
         first_assets = {
@@ -163,7 +179,7 @@ class TestGetAverageInterestRate:
                 {"id": "id_2", "interest_rate": 10},
             ]
         }
-        client.post(f"{base_url}/asset", json=first_assets)
+        test_client.post(f"{base_url}/asset", json=first_assets)
 
         # Save second set of assets (should overwrite the first)
         second_assets = {
@@ -172,10 +188,10 @@ class TestGetAverageInterestRate:
                 {"id": "id_2", "interest_rate": 30},
             ]
         }
-        client.post(f"{base_url}/asset", json=second_assets)
+        test_client.post(f"{base_url}/asset", json=second_assets)
 
         # Get the average interest rate
-        response = client.get(f"{base_url}/interest_rate")
+        response = test_client.get(f"{base_url}/interest_rate")
 
         assert response.status_code == 200
         response_data = response.json()
